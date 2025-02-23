@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Events Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .control-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .event-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .event-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        select, input, button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            background: #ffe6e6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="control-panel">
+            <h2>Free Fire Events Tester</h2>
+            <select id="region">
+                <option value="ind">India</option>
+                <option value="bd">Bangladesh</option>
+                <option value="sg">singapore</option>
+                <option value="id">indonesia</option>
+                <option value="eu">eruope</option>
+                <option value="th">thailand</option>
+                <option value="cis">cis</option>
+                <option value="me">middleeast</option>
+                <option value="vn">Vinetnam</option>
+            </select>
+            <input type="text" id="apiKey" placeholder="Enter API Key" value="SHAHG">
+            <button onclick="fetchEvents()">Fetch Events</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function fetchEvents() {
+            const region = document.getElementById('region').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = 'Loading...';
+
+            try {
+                // Try the first API
+                const url1 = `https://freefireinfo.vercel.app/event?region=${region}&key=${apiKey}`;
+                let response = await fetch(url1);
+                let data = await response.json();
+
+                if (!response.ok) {
+                    // If first API fails, try the second API
+                    const url2 = ``;
+                    response = await fetch(url2);
+                    data = await response.json();
+                }
+
+                // Display the results
+                if (data['Events Info']) {
+                    let html = '';
+                    data['Events Info'].forEach(event => {
+                        html += `
+                            <div class="event-card">
+                                <h3>${event.Title}</h3>
+                                ${event.Banner ? `<img src="${event.Banner}" alt="${event.Title}">` : ''}
+                                <p>Start: ${formatTimestamp(event.Start)}</p>
+                                <p>End: ${formatTimestamp(event.End)}</p>
+                                ${event.Description ? `<p>Description: ${event.Description}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">No events found</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<div class="error">Error fetching events: ${error.message}</div>`;
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            try {
+                const date = new Date(timestamp * 1000);
+                return date.toLocaleString();
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
+        // Fetch events on page load
+        fetchEvents();
+    </script>
+    <footer>MADE BY MK </footer>
+</body>
+</html>
